@@ -194,9 +194,11 @@ exports.unfavoriteAnArticle = (req) =>{
     });
 }
 
-/*exports.getArticleComments = (req) =>{
-    return Promise.resolve(req.payload ? User.findById(req.payload.id) : null).then(function(user){
-            return req.article.populate({
+exports.getArticleComments = (req) =>{
+    return new Promise((resolve,reject)=>{
+  
+    Promise.resolve(req.payload ? User.findById(req.payload.id) : null).then(function(user){
+            req.article.populate({
                 path: 'comments',
                 populate: {
                     path: 'author'
@@ -207,18 +209,36 @@ exports.unfavoriteAnArticle = (req) =>{
                     }
                 }
             }).execPopulate().then(function(article) {
-                return res.json({comments: req.article.comments.map(function(comment){
+                resolve({comments: req.article.comments.map(function(comment){
                     return comment.toJSONFor(user);
                 })});
             });
         }).catch((err)=>{
             reject(err);
         });   
-}*/
+
+        Promise.resolve(req.payload ? User.findById(req.payload.id) : null).then(function(user){
+            return req.article.populate({
+              path: 'comments',
+              populate: {
+                path: 'author'
+              },
+              options: {
+                sort: {
+                  createdAt: 'desc'
+                }
+              }
+            }).execPopulate().then(function(article) {
+              return res.json({comments: req.article.comments.map(function(comment){
+                return comment.toJSONFor(user);
+              })});
+            });
+    });
+}
 
 
   
-exports.unfavoriteAnArticle = (req) =>{
+exports.addNewComment = (req) =>{
     return new Promise((resolve,reject)=>{
         User.findById(req.payload.id).then(function(user){
             if(!user){ return resolve(401); }
@@ -240,7 +260,7 @@ exports.unfavoriteAnArticle = (req) =>{
     });
 }
 
-exports.unfavoriteAnArticle = (req) =>{
+exports.deleteComment = (req) =>{
     return new Promise((resolve,reject)=>{
         if(req.comment.author.toString() === req.payload.id.toString()){
             req.article.comments.remove(req.comment._id);

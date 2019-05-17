@@ -2,6 +2,7 @@ var router = require('express').Router();
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var auth = require('../auth');
+var serviceProfiles = require('./service/serviceProfiles');
 
 // Preload user profile on routes with ':username'
 router.param('username', function(req, res, next, username){
@@ -15,39 +16,28 @@ router.param('username', function(req, res, next, username){
 });
 
 router.get('/:username', auth.optional, function(req, res, next){
-  if(req.payload){
-    User.findById(req.payload.id).then(function(user){
-      if(!user){ return res.json({profile: req.profile.toProfileJSONFor(false)}); }
-
-      return res.json({profile: req.profile.toProfileJSONFor(user)});
-    });
-  } else {
-    return res.json({profile: req.profile.toProfileJSONFor(false)});
-  }
+  serviceProfiles.getProfile(req.profile, req.payload)
+  .then((profile)=>{
+    res.json(profile);
+  });
 });
 
 router.post('/:username/follow', auth.required, function(req, res, next){
-  var profileId = req.profile._id;
-
-  User.findById(req.payload.id).then(function(user){
-    if (!user) { return res.sendStatus(401); }
-
-    return user.follow(profileId).then(function(){
-      return res.json({profile: req.profile.toProfileJSONFor(user)});
-    });
-  }).catch(next);
+  serviceProfiles.postProfileFollow(req.profile, req.payload)
+  .then((value) =>{
+    if (value == 401) { resolve(value); }
+    res.json(value);
+  })
+  .catch(next);
 });
 
 router.delete('/:username/follow', auth.required, function(req, res, next){
-  var profileId = req.profile._id;
-
-  User.findById(req.payload.id).then(function(user){
-    if (!user) { return res.sendStatus(401); }
-
-    return user.unfollow(profileId).then(function(){
-      return res.json({profile: req.profile.toProfileJSONFor(user)});
-    });
-  }).catch(next);
+  serviceProfiles.deleteProfileFollow(req.profile, req.payload)
+  .then((value)=>{
+    if(value==401) { return res.json(value) }
+    return res.json(value);
+  })
+  .catch(next);
 });
 
 module.exports = router;

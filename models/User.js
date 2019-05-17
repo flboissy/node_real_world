@@ -27,6 +27,10 @@ UserSchema.methods.setPassword = function(password){
   this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
 };
 
+UserSchema.methods.getSalt = function(){
+  return crypto.randomBytes(16).toString('hex');
+}
+
 UserSchema.methods.generateJWT = function() {
   var today = new Date();
   var exp = new Date(today);
@@ -96,4 +100,4 @@ UserSchema.methods.isFollowing = function(id){
   });
 };
 
-mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema);

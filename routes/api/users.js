@@ -7,7 +7,7 @@ var userService = require('./service/usersService')
 
 router.get('/user', auth.required, function (req, res, next) {
 
-  userService.getUser(req)
+  userService.getUser(req.payload.id)
     .then((user) => {
       return res.json(user);
     })
@@ -24,7 +24,7 @@ router.get('/user', auth.required, function (req, res, next) {
 
 router.put('/user', auth.required, function (req, res, next) {
 
-  userService.putUser(req)
+  userService.putUser(req.payload.id,req.body.user)
     .then((user) => {
       return res.json(user)
     })

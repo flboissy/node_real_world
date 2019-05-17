@@ -1,9 +1,9 @@
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 
-exports.getUser = (req) => {
+exports.getUser = (id) => {
     return new Promise((resolve, reject) => {
-        User.findById(req.payload.id)
+        User.findById(id)
         .then((user) => {
             if(!user){
                 reject()
@@ -14,24 +14,24 @@ exports.getUser = (req) => {
     })
 }
 
-exports.putUser = (req) => {
+exports.putUser = (id, userBody) => {
     return new Promise((resolve, reject) => {
-        User.findById(req.payload.id)
+        User.findById(id)
             .then((user) => {
-                if (typeof req.body.user.username !== 'undefined') {
-                    user.username = req.body.user.username;
+                if (typeof userBody.username !== 'undefined') {
+                    user.username = userBody.username;
                 }
-                if (typeof req.body.user.email !== 'undefined') {
-                    user.email = req.body.user.email;
+                if (typeof userBody.email !== 'undefined') {
+                    user.email = userBody.email;
                 }
-                if (typeof req.body.user.bio !== 'undefined') {
-                    user.bio = req.body.user.bio;
+                if (typeof userBody.bio !== 'undefined') {
+                    user.bio =userBody.bio;
                 }
-                if (typeof req.body.user.image !== 'undefined') {
-                    user.image = req.body.user.image;
+                if (typeof userBody.image !== 'undefined') {
+                    user.image = userBody.image;
                 }
-                if (typeof req.body.user.password !== 'undefined') {
-                    user.setPassword(req.body.user.password);
+                if (typeof userBody.password !== 'undefined') {
+                    user.setPassword(userBody.password);
                 }
 
                 user.save().then(function () {

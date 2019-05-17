@@ -2,6 +2,7 @@ var assert = require('assert');
 var Comment = require('../models/Comment');
 var User = require('../models/User');
 var Article = require('../models/Article');
+var crypto = require('crypto');
 
 describe('Comment Model', function(){
     describe('Method toJSONFor()', function(){
@@ -12,7 +13,7 @@ describe('Comment Model', function(){
 
             user.password = "azerty";
             user.salt = "azerty";
-            user.hash = crypto.pbkdf2Sync(usr.password, usr.salt, 10000, 512, 'sha512').toString('hex');
+            user.hash = crypto.pbkdf2Sync(user.password, user.salt, 10000, 512, 'sha512').toString('hex');
 
             article.slug = "azerty";
             article.title = "azerty";

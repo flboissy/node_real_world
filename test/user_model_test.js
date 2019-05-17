@@ -2,6 +2,7 @@ var assert = require('assert');
 var User = require("../models/User");
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
+var secret = require('../config').secret;
 
 
 describe('User model', function(){
@@ -38,9 +39,35 @@ describe('User model', function(){
             var usr = new User();
             usr._id = "1";
             usr.username = "Momo henni";
-            usr.generateJWT();
-            assert.equal( true, jwt.verify(usr.token))
+            var generatedToken = usr.generateJWT();
+            assert.doesNotThrow(() => {jwt.verify(generatedToken,secret)})
+        })
+    })
 
+    describe('#toAuthJSON', function(){
+        it("Should geturn a valid JSON" , function() {
+            var usr = new User();
+            usr.generateJWT = ()=> {
+                return jwt.sign({
+                    id: this._id,
+                    username: this.username
+                }, "secret")
+              
+            }
+            usr._id = "1";
+            usr.username = "yolo";
+            usr.email = "email@gmail.com";
+            usr.bio = "La Bio";
+            usr.image = "image";
+            expectedToken = usr.generateJWT();
+            var expectedResp = {
+                username : "yolo",
+                email : "email@gmail.com",
+                token : expectedToken,
+                bio : "La Bio",
+                image : "image"
+            }
+            assert.equal(JSON.stringify(expectedResp), JSON.stringify(usr.toAuthJSON()));
         })
     })
 })

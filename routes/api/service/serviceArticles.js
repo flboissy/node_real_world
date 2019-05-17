@@ -217,7 +217,7 @@ exports.getArticleComments = (req) =>{
             reject(err);
         });   
 
-        Promise.resolve(req.payload ? User.findById(req.payload.id) : null).then(function(user){
+        /*Promise.resolve(req.payload ? User.findById(req.payload.id) : null).then(function(user){
             return req.article.populate({
               path: 'comments',
               populate: {
@@ -232,7 +232,7 @@ exports.getArticleComments = (req) =>{
               return res.json({comments: req.article.comments.map(function(comment){
                 return comment.toJSONFor(user);
               })});
-            });
+            });*/
     });
 }
 
